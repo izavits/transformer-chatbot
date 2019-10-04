@@ -80,6 +80,15 @@ def main():
     optimizer = tf.keras.optimizers.Adam(learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
     model.compile(optimizer=optimizer, loss=loss_function, metrics=[accuracy])
     model.fit(dataset, epochs=EPOCHS)
+
+    # Save model config and weights
+    model_name = config['DATA']['InputSet'].split('/')[-1].split('.')[0]
+    # Save JSON config to disk
+    json_config = model.to_json()
+    with open('../models/'+model_name+'_config.json', 'w') as json_file:
+        json_file.write(json_config)
+    # Save weights to disk
+    model.save_weights('../models/'+model_name+'_model.h5')
     return model
 
 
