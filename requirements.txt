@@ -1,3 +1,5 @@
 tensorflow==2.0.0
 tensorflow-datasets==1.2.0
 pytest==5.2.0
+PyYAML==5.1.2
+h5py==2.10.0
