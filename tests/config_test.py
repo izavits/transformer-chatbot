@@ -9,7 +9,7 @@ class TestConfigIntegrity(unittest.TestCase):
 
     def setUp(self):
         self.config = configparser.ConfigParser()
-        self.config.read('../config.ini')
+        self.config.read('config.ini')
 
     def test_num_sections(self):
         """Check if the config has two sections"""
