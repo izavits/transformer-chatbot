@@ -37,6 +37,7 @@ def main():
     config.read('../config.ini')
     seed = int(config['MODEL']['TfRandomSeed'])
     tf.random.set_seed(seed)
+    datafile = '../' + config['DATA']['InputSet']
     # Hyper-parameters
     NUM_LAYERS = int(config['MODEL']['NumLayers'])
     D_MODEL = int(config['MODEL']['Dmodel'])
@@ -46,7 +47,7 @@ def main():
     MAX_LENGTH = int(config['MODEL']['MaxLength'])
     EPOCHS = int(config['MODEL']['Epochs'])
 
-    inputs, outputs = load_data()
+    inputs, outputs = load_data(datafile)
     data_tokenizer, START_TOKEN, END_TOKEN, VOCAB_SIZE = build_tokenizer(inputs, outputs)
     questions, answers = tokenize(inputs, outputs)
     dataset = construct_input(questions, answers)

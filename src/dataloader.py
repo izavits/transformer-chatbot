@@ -25,11 +25,8 @@ def preprocess(line):
     return line
 
 
-def load_data():
+def load_data(datafile):
     """Load the dataset"""
-    config = configparser.ConfigParser()
-    config.read('../config.ini')
-    datafile = '../'+config['DATA']['InputSet']
     inputs, outputs = [], []
     # Input data is not valid json to load at once
     with open(datafile) as f:
