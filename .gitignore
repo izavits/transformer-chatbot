@@ -32,5 +32,6 @@ nbproject
 .idea
 .vscode
 venv
+models
 
 # Others
