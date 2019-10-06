@@ -34,20 +34,70 @@ class TestConfigIntegrity(unittest.TestCase):
         data_section = self.config['DATA']
         self.assertTrue('InputSet' in data_section, error_msg)
 
-    def test_model_section_params(self):
-        """Check that the model section has all the needed parameters"""
-        error_msg = 'MODEL section must have all needed parameters'
+    def test_model_section_maxsamples(self):
+        """Check that the model section has the MaxSamples parameter"""
+        error_msg = 'MODEL section must have the MaxSamples parameter'
         model_section = self.config['MODEL']
         self.assertTrue('MaxSamples' in model_section, error_msg)
+
+    def test_model_section_epochs(self):
+        """Check that the model section has the Expochs parameter"""
+        error_msg = 'MODEL section must have the Expochs parameter'
+        model_section = self.config['MODEL']
         self.assertTrue('Epochs' in model_section, error_msg)
+
+    def test_model_section_tfrandomseed(self):
+        """Check that the model section has the TfRandomSeed parameter"""
+        error_msg = 'MODEL section must have the TfRandomSeed parameter'
+        model_section = self.config['MODEL']
         self.assertTrue('TfRandomSeed' in model_section, error_msg)
+
+    def test_model_section_batchsize(self):
+        """Check that the model section has the BatchSize parameter"""
+        error_msg = 'MODEL section must have the BatchSize parameter'
+        model_section = self.config['MODEL']
         self.assertTrue('BatchSize' in model_section, error_msg)
+
+    def test_model_section_buffersize(self):
+        """Check that the model section has the BufferSize parameter"""
+        error_msg = 'MODEL section must have the BufferSize parameter'
+        model_section = self.config['MODEL']
         self.assertTrue('BufferSize' in model_section, error_msg)
+
+    def test_model_section_numlayers(self):
+        """Check that the model section has the NumLayers parameter"""
+        error_msg = 'MODEL section must have the NumLayers parameter'
+        model_section = self.config['MODEL']
         self.assertTrue('NumLayers' in model_section, error_msg)
+
+    def test_model_section_dmodel(self):
+        """Check that the model section has the Dmodel parameter"""
+        error_msg = 'MODEL section must have the Dmodel parameter'
+        model_section = self.config['MODEL']
         self.assertTrue('Dmodel' in model_section, error_msg)
+
+    def rest_model_section_numheads(self):
+        """Check that the model section has the NumHeads parameter"""
+        error_msg = 'MODEL section must have the NumHeads parameter'
+        model_section = self.config['MODEL']
         self.assertTrue('NumHeads' in model_section, error_msg)
+
+    def test_model_section_units(self):
+        """Check that the model section has the Units parameter"""
+        error_msg = 'MODEL section must have the Units parameter'
+        model_section = self.config['MODEL']
         self.assertTrue('Units' in model_section, error_msg)
+
+    def test_model_section_dropout(self):
+        """Check that the model section has the Dropout parameter"""
+        error_msg = 'MODEL section must have the Units parameter'
+        model_section = self.config['MODEL']
         self.assertTrue('Dropout' in model_section, error_msg)
+
+    def test_model_section_maxlength(self):
+        """Check that the model section has the MaxLength parameter"""
+        error_msg = 'MODEL section must have the MaxLength parameter'
+        model_section = self.config['MODEL']
         self.assertTrue('MaxLength' in model_section, error_msg)
 
 
