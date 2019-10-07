@@ -26,7 +26,7 @@ pip install requirements
 ``` 
 
 ### Use docker
-For concenience purposes, the application comes dockerized. All you need is to have Docker installed 
+For concenience purposes, the application comes Dockerized. All you need is to have Docker installed 
 on your machine in order to build the image and run the container.
 
 - Build image:
@@ -48,7 +48,7 @@ Docker installation steps described above. When you run the docker image, the ap
 automatically. The model comes pre-trained using the `ALARM_SET` dataset in order to quickly start using
 it and do some discussions with the chatbot.
 
-If you have the application installed on your local system, then some basic commands are proivided:
+If you have the application installed on your local system, then some basic commands are provided:
 
 - Run the pre-trained model:
 
