@@ -5,6 +5,9 @@ Evaluates the input and provides the decoded output.
 import configparser
 import argparse
 from argparse import RawTextHelpFormatter
+import emoji
+import sys
+from termcolor import colored, cprint
 import tensorflow as tf
 from dataloader import preprocess, load_data, build_tokenizer
 from model import transformer
@@ -74,8 +77,6 @@ def predict(utterance):
     prediction = evaluate(utterance)
     predicted_sentence = data_tokenizer.decode(
         [i for i in prediction if i < data_tokenizer.vocab_size])
-    print('Input: {}'.format(utterance))
-    print('Output: {}'.format(predicted_sentence))
     return predicted_sentence
 
 
@@ -88,9 +89,9 @@ if __name__ == '__main__':
     MAX_LENGTH = int(config['MODEL']['MaxLength'])
     # Parse command line arguments
     welcome = "Welcome to chatbot.\n"
-    welcome += "Use the config.ini file to setup the required parameters and input dataset."
+    welcome += "Use the config.ini file to setup the required parameters and input dataset.\n"
+    welcome += "Start chatting with the bot. Type 'bye' or Ctrl^C to exit"
     parser = argparse.ArgumentParser(description=welcome, formatter_class=RawTextHelpFormatter)
-
     parser.add_argument('--train', '-t', required=False,
                         help='train the model before using for chatting',
                         action='store_true')
@@ -101,7 +102,27 @@ if __name__ == '__main__':
         # First train the model and then use it to make predictions
         main()
     model = load_model()
-    # Make predictions
-    output = predict('i need help with my alarm')
-    output = predict('remove my alarm at 7 am')
+
+    # Start prompt and make predictions
+    print('\n\n')
+    print(colored('Summoning chatbot..', 'red', attrs=['bold']))
+    print('\n\n')
+    print(colored(emoji.emojize(':robot_face: :speech_balloon: >> Hello how can I help you?'),
+                  'green'))
+    while True:
+        try:
+            user_input = input('User >> ')
+            if user_input == 'bye':
+                print(colored(emoji.emojize(':robot_face: :speech_balloon: >> bye bye then'),
+                              'green'))
+                print('')
+                sys.exit(1)
+            output = predict(user_input)
+            print(colored(emoji.emojize(':robot_face: :speech_balloon: >> ' + output), 'green'))
+        except KeyboardInterrupt:
+            print('')
+            print(colored(emoji.emojize(':robot_face: :speech_balloon: >> bye bye then'),
+                          'green'))
+            print('')
+            sys.exit(1)
 
