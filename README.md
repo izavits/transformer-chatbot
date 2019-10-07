@@ -4,6 +4,23 @@
 
 This is a chatbot based on a neural network architecture, called transformer. The transformer model is
 entirely built on the self attention mechanisms without using sequence-aligned recurrent architecture.
+(An attention function can be described as mapping a query and a set of key-value pairs to an output, 
+where the query, keys, values, and output are all vectors. The output is computed as a weighted 
+sum of the values, where the weight assigned to each value is computed by a compatibility function 
+of the query with the corresponding key.)
+
+The major component in the transformer is the unit of multi-head self-attention mechanism. 
+The transformer views the encoded representation of the input as a set of key-value pairs, (K,V), 
+both of dimension n (input sequence length); in the context of NMT, both the keys and values are 
+the encoder hidden states. In the decoder, the previous output is compressed into a query 
+(Q of dimension m) and the next output is produced by mapping this query and the set of keys and values.
+
+The transformer adopts the scaled dot-product attention: the output is a weighted sum of the values, 
+where the weight assigned to each value is determined by the dot-product of the query with all the keys.
+
+Rather than only computing the attention once, the multi-head mechanism runs through the scaled 
+dot-product attention multiple times in parallel. The independent attention outputs are simply 
+concatenated and linearly transformed into the expected dimensions.
 
 ## Table of Contents
 
