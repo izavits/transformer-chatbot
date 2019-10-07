@@ -1,14 +1,17 @@
 """Model functions unit tests"""
 
 import unittest
-from src.model import PositionalEncoding
+from src.model import PositionalEncoding, create_padding_mask, create_look_ahead_mask
+import tensorflow as tf
 
 
 class TestModel(unittest.TestCase):
     """Check the integrity of model functions"""
 
-    def setUp(self) -> None:
-        pass
+    def setUp(self):
+        self.fake_data = [
+            [1, 2, 3, 4, 5]
+        ]
 
     def test_positional_encoding(self):
         """Check the positional encoding"""
@@ -21,6 +24,16 @@ class TestModel(unittest.TestCase):
         datafile = './data/SAMPLE_SET.txt'
         model_name = datafile.split('/')[-1].split('.')[0]
         self.assertEqual(model_name, 'SAMPLE_SET')
+
+    def test_padding_mask(self):
+        """Check the padding mask"""
+        mask = create_padding_mask(self.fake_data)
+        self.assertEqual(mask.shape, tf.TensorShape([1, 1, 1, 5]))
+
+    def test_look_ahead_mask(self):
+        """Check the look ahead mask"""
+        mask = create_look_ahead_mask(self.fake_data)
+        self.assertEqual(mask.shape, tf.TensorShape([1, 1, 5, 5]))
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestModel)
