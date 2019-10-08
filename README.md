@@ -39,7 +39,7 @@ assumes the existence of Python3 language.
 ```
 virtualenv -p `which python3` venv
 source venv/bin/activate
-pip install requirements
+pip install -r requirements.txt
 ``` 
 
 ### Use docker
