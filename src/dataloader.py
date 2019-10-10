@@ -48,7 +48,7 @@ def build_tokenizer(ins, outs):
 
 
 def tokenize(inputs, outputs):
-    """Tokenize data."""
+    """Tokenize and pad data."""
     tokenized_ins, tokenized_outs = [], []
     data_tokenizer, START_TOKEN, END_TOKEN, VOCAB_SIZE = build_tokenizer(inputs, outputs)
     for (question, answer) in zip(inputs, outputs):
@@ -56,7 +56,6 @@ def tokenize(inputs, outputs):
         answer = START_TOKEN + data_tokenizer.encode(answer) + END_TOKEN
         tokenized_ins.append(question)
         tokenized_outs.append(answer)
-    # pad tokenized sentences
     tokenized_ins = tf.keras.preprocessing.sequence.pad_sequences(tokenized_ins, maxlen=80, padding='post')
     tokenized_outs = tf.keras.preprocessing.sequence.pad_sequences(tokenized_outs, maxlen=80, padding='post')
     return tokenized_ins, tokenized_outs
@@ -68,6 +67,7 @@ def construct_input(questions, answers):
     config.read('../config.ini')
     BATCH_SIZE = int(config['MODEL']['BatchSize'])
     BUFFER_SIZE = int(config['MODEL']['BufferSize'])
+    # Use the tensorflow data API to exploit caching and prefetching features
     # Use teacher - forcing: pass the true output to the next step
     dataset = tf.data.Dataset.from_tensor_slices((
         {
