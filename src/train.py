@@ -15,7 +15,15 @@ __status__ = "Research Ready"
 
 class LearningRate(tf.keras.optimizers.schedules.LearningRateSchedule):
     """Set up the learning rate. Use the Adam optimizer and the learning
-    rate scheduler descibed in https://arxiv.org/abs/1706.03762"""
+    rate scheduler descibed in https://arxiv.org/abs/1706.03762
+    The learning rate varies during training.
+    Learning rate is increased linearly up to warm_up steps,
+    and then slowly decreased.
+
+    Args:
+        d_model (int): number of features
+        warmup_steps (int)
+    """
 
     def __init__(self, d_model, warmup_steps=4000):
         """Class constructor"""
@@ -32,13 +40,17 @@ class LearningRate(tf.keras.optimizers.schedules.LearningRateSchedule):
 
 
 def main():
-    """Main function"""
+    """Main function to create the model, compile, fit
+    and save to disk.
+    """
+    # Get the configuration from file
     config = configparser.ConfigParser()
     config.read('../config.ini')
     seed = int(config['MODEL']['TfRandomSeed'])
     tf.random.set_seed(seed)
     datafile = '../' + config['DATA']['InputSet']
-    # Hyper-parameters
+
+    # Get hyper-parameters
     NUM_LAYERS = int(config['MODEL']['NumLayers'])
     D_MODEL = int(config['MODEL']['Dmodel'])
     NUM_HEADS = int(config['MODEL']['NumHeads'])
@@ -47,12 +59,13 @@ def main():
     MAX_LENGTH = int(config['MODEL']['MaxLength'])
     EPOCHS = int(config['MODEL']['Epochs'])
 
+    # Prepare data
     inputs, outputs = load_data(datafile)
     data_tokenizer, START_TOKEN, END_TOKEN, VOCAB_SIZE = build_tokenizer(inputs, outputs)
     questions, answers = tokenize(inputs, outputs)
     dataset = construct_input(questions, answers)
 
-    # Train the model
+    # Create model
     tf.keras.backend.clear_session()
     model = transformer(
         vocab_size=VOCAB_SIZE,
