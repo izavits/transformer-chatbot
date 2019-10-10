@@ -113,6 +113,8 @@ For your convenience the dataset is also provided in the project directory. Thus
 `config.ini` file you can select different train datasets and different model parameters. The trained 
 models are stored in the `models` directory of the project.
 
+Finally, jupyter notebooks are also privided inside the `notebooks` directory of the project.
+
 
 ## Tests
 Unit tests are included. Install `pytest` if needed and run it to execute them:
