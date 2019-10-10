@@ -21,7 +21,7 @@ __status__ = "Research Ready"
 
 
 def load_model():
-    """Load the model, the weights and the needed parameters"""
+    """Load the model from disk, the weights and the needed parameters"""
     config = configparser.ConfigParser()
     config.read('../config.ini')
     model_name = config['DATA']['InputSet'].split('/')[-1].split('.')[0]
@@ -44,8 +44,10 @@ def load_model():
     return model
 
 
-def get_extreme_tokens():
-    """Get start and end tokens"""
+def get_data_params():
+    """Get dataset needed parameters:
+    the tokenizer, start and end tokens and vocabulary size
+    """
     config = configparser.ConfigParser()
     config.read('../config.ini')
     datafile = '../' + config['DATA']['InputSet']
@@ -55,7 +57,9 @@ def get_extreme_tokens():
 
 
 def evaluate(utterance):
-    """Evaluate the given utterance and return output"""
+    """Evaluate the given utterance and return output.
+    Apply the same preprocessing method used to prepare the data
+    for training."""
     utterance = preprocess(utterance)
     utterance = tf.expand_dims(START_TOKEN + data_tokenizer.encode(utterance) + END_TOKEN, axis=0)
     output = tf.expand_dims(START_TOKEN, 0)
@@ -67,13 +71,13 @@ def evaluate(utterance):
         # return the result if the predicted_id is equal to the end token
         if tf.equal(predicted_id, END_TOKEN[0]):
             break
-        # concatenated the predicted_id to the output which is given to the decoder
-        # as its input.
+        # concatenate the predicted word to the decoder input
         output = tf.concat([output, predicted_id], axis=-1)
     return tf.squeeze(output, axis=0)
 
 
 def predict(utterance):
+    """Evaluate the given utterance and return the predicted sentence."""
     prediction = evaluate(utterance)
     predicted_sentence = data_tokenizer.decode(
         [i for i in prediction if i < data_tokenizer.vocab_size])
@@ -83,7 +87,7 @@ def predict(utterance):
 if __name__ == '__main__':
     """Main method"""
     # Get necessary parameters
-    START_TOKEN, END_TOKEN, data_tokenizer, VOCAB_SIZE = get_extreme_tokens()
+    START_TOKEN, END_TOKEN, data_tokenizer, VOCAB_SIZE = get_data_params()
     config = configparser.ConfigParser()
     config.read('../config.ini')
     MAX_LENGTH = int(config['MODEL']['MaxLength'])
@@ -98,8 +102,11 @@ if __name__ == '__main__':
     parser.parse_args()
     args = parser.parse_args()
     train = args.train
+
     if train:
-        # First train the model and then use it to make predictions
+        # If train==true we need to train the model
+        # and then use it to make predictions.
+        # Use the main method from the train module
         main()
     model = load_model()
 
