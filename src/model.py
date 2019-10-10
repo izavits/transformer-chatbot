@@ -15,13 +15,13 @@ __status__ = "Research Ready"
 def attention_weights(query, key, value, mask):
     """Calculate attention weights based on the
     scaled dot-product attention function."""
-    matmul_qk = tf.matmul(query, key, transpose_b=True)
+    qk = tf.matmul(query, key, transpose_b=True)
     depth = tf.cast(tf.shape(key)[-1], tf.float32)
-    logits = matmul_qk / tf.math.sqrt(depth)
+    logits = qk / tf.math.sqrt(depth)
     if mask is not None:
         logits += (mask * -1e9)
-    attention_weights = tf.nn.softmax(logits, axis=-1)
-    output = tf.matmul(attention_weights, value)
+    weights = tf.nn.softmax(logits, axis=-1)
+    output = tf.matmul(weights, value)
     return output
 
 
@@ -34,9 +34,9 @@ def create_padding_mask(x):
 def create_look_ahead_mask(x):
     """Mask future tokens in a sequence."""
     seq_len = tf.shape(x)[1]
-    look_ahead_mask = 1 - tf.linalg.band_part(tf.ones((seq_len, seq_len)), -1, 0)
+    mask = 1 - tf.linalg.band_part(tf.ones((seq_len, seq_len)), -1, 0)
     padding_mask = create_padding_mask(x)
-    return tf.maximum(look_ahead_mask, padding_mask)
+    return tf.maximum(mask, padding_mask)
 
 
 class MultiHeadAttention(tf.keras.layers.Layer):
@@ -44,7 +44,13 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     - Linear layers and split into heads
     - Scaled dot-product attention
     - Heads concatenation
-    - Final linear layer"""
+    - Final linear layer
+
+    Args:
+        d_model (int): dimension of embedding size and the model data flow
+        num_heads (int): number of heads in multi-head attention
+        name (str)
+    """
 
     def __init__(self, d_model, num_heads, name="multi_head_attention"):
         """Class constructor."""
@@ -59,7 +65,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         self.dense = tf.keras.layers.Dense(units=d_model)
 
     def split_heads(self, ins, batch_size):
-        """Split into heads"""
+        """Split inputs to heads"""
         ins = tf.reshape(
             ins, shape=(batch_size, -1, self.num_heads, self.depth))
         return tf.transpose(ins, perm=[0, 2, 1, 3])
@@ -92,7 +98,8 @@ class PositionalEncoding(tf.keras.layers.Layer):
     """Add positional encoding to give more info about the
     relative position of the words in a sentence. The specific
     model by itself makes no assumptions about the spatial
-    relationships across the data."""
+    relationships across the data.
+    """
 
     def __init__(self, position, d_model):
         """Class constructor"""
@@ -100,7 +107,7 @@ class PositionalEncoding(tf.keras.layers.Layer):
         self.pos_encoding = self.positional_encoding(position, d_model)
 
     def get_angles(self, position, i, d_model):
-        """Calculate anglr rads"""
+        """Calculate angle rads"""
         angles = 1 / tf.pow(10000, (2 * (i // 2)) / tf.cast(d_model, tf.float32))
         return position * angles
 
@@ -124,7 +131,8 @@ class PositionalEncoding(tf.keras.layers.Layer):
 
 def encoder_layer(units, d_model, num_heads, dropout, name="encoder_layer"):
     """The encoder layer consists of a multi head attention sublayer
-    and two dense layers followed by dropout."""
+    and two dense layers followed by dropout.
+    """
     ins = tf.keras.Input(shape=(None, d_model), name="inputs")
     padding_mask = tf.keras.Input(shape=(1, 1, None), name="padding_mask")
     attention = MultiHeadAttention(
@@ -144,7 +152,8 @@ def encoder_layer(units, d_model, num_heads, dropout, name="encoder_layer"):
 
 def encoder(vocab_size, num_layers, units, d_model, num_heads, dropout, name="encoder"):
     """The encoder consists of the input embedding, the positional encoding
-    and the given number of layers."""
+    and the given number of layers.
+    """
     ins = tf.keras.Input(shape=(None,), name="inputs")
     padding_mask = tf.keras.Input(shape=(1, 1, None), name="padding_mask")
     embeddings = tf.keras.layers.Embedding(vocab_size, d_model)(ins)
@@ -166,7 +175,8 @@ def decoder_layer(units, d_model, num_heads, dropout, name="decoder_layer"):
     """The decoder layer consists of a masked multi head attention layer,
     a multi head attention layer that receives the encoder output and the
     output of the masked multi head attention sublayer, and two dense
-    layers followed by dropout."""
+    layers followed by dropout.
+    """
     inputs = tf.keras.Input(shape=(None, d_model), name="inputs")
     enc_outputs = tf.keras.Input(shape=(None, d_model), name="encoder_outputs")
     look_ahead_mask = tf.keras.Input(
@@ -202,7 +212,8 @@ def decoder_layer(units, d_model, num_heads, dropout, name="decoder_layer"):
 
 def decoder(vocab_size, num_layers, units, d_model, num_heads, dropout, name='decoder'):
     """The decoder consists of output embedding, the positional encoding and the
-    given number of decoder layers."""
+    given number of decoder layers.
+    """
     inputs = tf.keras.Input(shape=(None,), name='inputs')
     enc_outputs = tf.keras.Input(shape=(None, d_model), name='encoder_outputs')
     look_ahead_mask = tf.keras.Input(shape=(1, None, None), name='look_ahead_mask')
@@ -228,7 +239,8 @@ def decoder(vocab_size, num_layers, units, d_model, num_heads, dropout, name='de
 def transformer(vocab_size, num_layers, units, d_model, num_heads, dropout, name="transformer"):
     """The transformer consists of the encoder, decoder and a final linear layer.
     The output of the decoder constitutes the input to the final linear layer and
-    its output is returned."""
+    its output is returned.
+    """
     inputs = tf.keras.Input(shape=(None,), name="inputs")
     dec_inputs = tf.keras.Input(shape=(None,), name="dec_inputs")
     enc_padding_mask = tf.keras.layers.Lambda(
